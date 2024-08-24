@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-2X9vnqJ+e9Up7Rx8l+eG7A4kV6ZsG7dZ+2/1vG6u5MQ3nN3V9bk4tF4c9Suobnt5k6n5Hr/s4r6rVTX8DpKqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css" integrity="sha512-4TqjO1qKFTAd/JXtq1/QzAVfPfc7hbZqql+0BB1z7lc5JFs3u/Mu4A1Kk2NV1rFLQn6T5fbh+crJfoZCnVYFA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('<%= imageUrl %>') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .register-container {
+      background: rgba(0, 0, 0, 0.7); /* Dark blurry background with increased transparency */
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px); /* Blur effect for the background */
+    }
+    .register-container h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .register-container div {
+      margin-bottom: 20px;
+    }
+    .register-container input {
+      font-size: 1.2rem;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 100%;
+    }
+    .register-container button {
+      font-size: 1.2rem;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    .register-container button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+    a {
+      color: #007bff;
+      font-size: 1.2rem;
+    }
+    a:hover {
+      color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Create a New Account</h1>
+    <form action="/new" method="POST">
+      <div>
+        <input type="text" name="username" placeholder="Username" required />
+      </div>
+      <div>
+        <input type="password" name="password" placeholder="Password" required />
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <div class="error"><%= error %></div>
+    <a href="/">Back to Login</a>
+  </div>
+</body>
+</html>
