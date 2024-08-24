@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
 app.set('views', path.join(__dirname, 'views'));
-
+app.set('images', path.join(__dirname, 'public/images'));
+app.set('home', path.join(__dirname, 'routes/home'));
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));

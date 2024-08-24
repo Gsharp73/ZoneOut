@@ -33,10 +33,9 @@ router.get('/', async (req, res) => {
 
   let imageUrl = req.session.imageUrl;
 
-  // Fetch a new image if not set or if user requests a new one
   if (!imageUrl) {
     imageUrl = await getRandomImage();
-    req.session.imageUrl = imageUrl; // Save to session
+    req.session.imageUrl = imageUrl; 
   }
 
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -74,7 +73,6 @@ router.post('/toggleTask/:id', async (req, res) => {
   res.redirect('/home');
 });
 
-// Delete a task
 router.post('/deleteTask/:id', async (req, res) => {
   const taskId = req.params.id;
   const username = req.session.username;
@@ -87,7 +85,6 @@ router.post('/deleteTask/:id', async (req, res) => {
   res.redirect('/home');
 });
 
-// Change Background route
 router.post('/changeBackground', async (req, res) => {
   const newImageUrl = await getRandomImage();
   req.session.imageUrl = newImageUrl; // Update session image URL
