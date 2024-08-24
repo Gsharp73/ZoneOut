@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
+
 const path = require('path');
 app.set('views', path.join(__dirname, 'views'));
 
