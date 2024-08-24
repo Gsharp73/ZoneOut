@@ -3,8 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-app.set('views', path.join(__dirname, 'views'));
 const app = express();
+const path = require('path');
+app.set('views', path.join(__dirname, 'views'));
+
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
