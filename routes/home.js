@@ -62,7 +62,6 @@ router.post('/toggleTask/:id', async (req, res) => {
   try {
       const taskId = req.params.id;
       const username = req.session.username;
-
       const user = await User.findOne({ username });
       if (!user) {
           return res.status(404).send('User not found');

@@ -16,7 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: 'your_secret_key',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: true,
+  cookie: { secure: false }
 }));
 console.log('MongoDB URI:', process.env.MONGODB_URI);
 mongoose.connect(process.env.MONGODB_URI, {
