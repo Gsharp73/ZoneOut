@@ -59,35 +59,55 @@ router.post('/addTask', async (req, res) => {
 });
 
 router.post('/toggleTask/:id', async (req, res) => {
-  const taskId = req.params.id;
-  const username = req.session.username;
+  try {
+      const taskId = req.params.id;
+      const username = req.session.username;
 
-  const user = await User.findOne({ username: username });
-  const task = user.tasks.id(taskId);
+      const user = await User.findOne({ username });
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
 
-  if (task) {
-    task.completed = !task.completed;
-    await user.save();
+      const task = user.tasks.id(taskId);
+      if (task) {
+          task.completed = !task.completed;
+          await user.save();
+      } else {
+          return res.status(404).send('Task not found');
+      }
+
+      res.redirect('/home');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
   }
-
-  res.redirect('/home');
 });
 
 router.post('/deleteTask/:id', async (req, res) => {
-  const taskId = req.params.id;
-  const username = req.session.username;
+  try {
+      const taskId = req.params.id;
+      const username = req.session.username;
 
-  await User.findOneAndUpdate(
-    { username: username },
-    { $pull: { tasks: { _id: taskId } } }
-  );
+      const user = await User.findOneAndUpdate(
+          { username },
+          { $pull: { tasks: { _id: taskId } } }
+      );
 
-  res.redirect('/home');
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      res.redirect('/home');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
 });
+
 
 router.post('/changeBackground', async (req, res) => {
   const newImageUrl = await getRandomImage();
-  req.session.imageUrl = newImageUrl; // Update session image URL
+  req.session.imageUrl = newImageUrl; 
   res.json({ imageUrl: newImageUrl });
 });
 
