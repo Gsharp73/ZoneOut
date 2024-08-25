@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   res.render('login', { imageUrl, error: null });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
 

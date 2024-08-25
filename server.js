@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
 
 
-app.use('/', require('./routes/login'));
+app.use('/login', require('./routes/login'));
 app.use('/home', require('./routes/home'));
 
 const PORT = process.env.PORT || 3000;
