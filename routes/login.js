@@ -4,47 +4,62 @@ const User = require('../models/User');
 const axios = require('axios');
 
 async function getRandomImage() {
-  const response = await axios.get(`https://api.unsplash.com/photos/random?client_id=${process.env.UNSPLASH_ACCESS_KEY}`);
-  return response.data.urls.full;
+  try {
+    const response = await axios.get(`https://api.unsplash.com/photos/random?client_id=${process.env.UNSPLASH_ACCESS_KEY}`);
+    return response.data.urls.full;
+  } catch (error) {
+    console.error('Error fetching image:', error);
+    return null;
+  }
 }
 
 router.get('/', async (req, res) => {
-  const imageUrl = await getRandomImage();
-  res.render('login', { imageUrl, error: null });
-});
-
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ username });
-
-  if (user && user.password === password) {
-    req.session.username = username;
-    res.redirect('/home');
-  } else {
+  try {
     const imageUrl = await getRandomImage();
-    res.render('login', { imageUrl, error: 'Invalid username or password' });
+    res.render('login', { imageUrl, error: null });
+  } catch (error) {
+    res.status(500).send('Server Error');
   }
 });
 
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+      
+    const user = await User.findOne({ username });
 
-router.get('/new', async (req, res) => {
-  const imageUrl = await getRandomImage();
-  res.render('newuser', { imageUrl, error: null });
+    if (user && user.password === password) {
+      req.session.username = username;
+      console.log("Loggedin");
+      res.json({ success: true, redirect: '/home' });
+    } else {
+      console.log("false");
+      const imageUrl = await getRandomImage();
+      res.json({ success: false, error: 'Invalid username or password', imageUrl });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
 });
 
 router.post('/new', async (req, res) => {
-  const { username, password } = req.body;
-  const existingUser = await User.findOne({ username });
-    console.log(username, password);
-  if (existingUser) {
-    const imageUrl = await getRandomImage();
-    res.render('login', { imageUrl, error: 'Username already exists' });
-  } 
-  else {
-    const newUser = new User({ username, password });
-    await newUser.save();
-    req.session.username = username;
-    res.redirect('/home');
+  try {
+    const { username, password } = req.body;
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      const imageUrl = await getRandomImage();
+      res.json({ success: false, error: 'Username already exists', imageUrl });
+    } else {
+      const newUser = new User({ username, password });
+      await newUser.save();
+      req.session.username = username;
+      res.json({ success: true, redirect: '/home' });
+    }
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
 

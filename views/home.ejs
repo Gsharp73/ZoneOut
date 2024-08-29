@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-2X9vnqJ+e9Up7Rx8l+eG7A4kV6ZsG7dZ+2/1vG6u5MQ3nN3V9bk4tF4c9Suobnt5k6n5Hr/s4r6rVTX8DpKqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-2X9vnqJ+e9Up7Rx8l+eG7A4kV6ZsG7dZ+2/1vG6u5MQ3nN3V9bk4tF4c9Suobnt5k6n5Hr/s4r6rVTX8DpKqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />  
   <style>
     body {
       margin: 0;
@@ -247,19 +247,19 @@
       <h3>What's on your mind!</h3>
       <% tasks.forEach(function(task) { %>
         <div class="task">
-          <form action="/home/toggleTask/<%= task._id %>" method="POST">
+          <form action="/home/toggleTask/<%= task._id %>?usern=<%= username %>" method="POST">
             <input type="checkbox" onChange="this.form.submit()" <%= task.completed ? 'checked' : '' %> />
             <span style=`text-decoration: <%= task.completed ? 'line-through' : 'none' %>;`><%= task.name %></span>
           </form>
-          <form action="/home/deleteTask/<%= task._id %>" method="POST" class="delete-button-form">
+          <form action="/home/deleteTask/<%= task._id %>?usern=<%= username %>" method="POST" class="delete-button-form">
             <button type="submit" class="delete-button">
               <img src="/images/bin.png" alt="Delete Task">
             </button>
           </form>
-        </div>
+        </div>        
       <% }) %>
       <div class="add-task">
-        <form action="/home/addTask" method="POST">
+        <form id="addTaskForm">
           <input type="text" name="taskName" placeholder="Add a new task" required />
           <button type="submit" class="add-button">
             <img src="/images/add.png" alt="Add Task">
@@ -270,6 +270,46 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('#addTaskForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const taskName = document.querySelector('input[name="taskName"]').value;
+        addTask(taskName);
+      });
+
+      async function addTask(taskn) {
+        const userr = localStorage.getItem('username');
+        if (!userr) {
+          alert('User not logged in');
+          return;
+        }
+
+        const response = await fetch('/home/addTask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ taskName: taskn , username: userr }),
+        });
+
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert('Failed to add task');
+        }
+      }
+    });
+      document.querySelector('.logout-button').addEventListener('click', function() {
+        fetch('/home/logout', { method: 'POST' })
+          .then(() => {
+            localStorage.removeItem('username');
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('password');
+            window.location.href = '/'; 
+          });
+          console.log('loggedout');
+      });
+
       function updateTime() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -293,15 +333,6 @@
           .catch(error => console.error('Error:', error));
       });
 
-      document.querySelector('.logout-button').addEventListener('click', function() {
-        fetch('/home/logout', { method: 'POST' })
-          .then(() => {
-            localStorage.removeItem('username');
-            localStorage.removeItem('isLoggedIn');
-            window.location.href = '/'; 
-          });
-      });
-
       function checkLoginStatus() {
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         if (!isLoggedIn) {
@@ -315,3 +346,5 @@
 
 </body>
 </html>
+
+

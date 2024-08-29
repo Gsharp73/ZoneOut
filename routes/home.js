@@ -25,7 +25,9 @@ async function getRandomImage() {
 }
 
 router.get('/', async (req, res) => {
-  if (!req.session.username) {
+  const username = req.query.username || req.headers['x-username'];
+  if (!username) {
+    console.log('no username');
     return res.redirect('/');
   }
 
@@ -37,7 +39,6 @@ router.get('/', async (req, res) => {
   }
 
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const username = req.session.username;
 
   const user = await User.findOne({ username: username });
 
@@ -45,9 +46,10 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/addTask', async (req, res) => {
-  const { taskName } = req.body;
-  const username = req.session.username;
-  
+  const { taskName, username } = req.body;
+  console.log(req.body);
+  console.log(taskName);
+  console.log(username);
   if (!username) {
     return res.status(401).send('Unauthorized');
   }
@@ -57,13 +59,14 @@ router.post('/addTask', async (req, res) => {
     { $push: { tasks: { name: taskName } } }
   );
 
-  res.redirect('/home');
+  res.redirect('/home?username=' + encodeURIComponent(username));
 });
 
 router.post('/toggleTask/:id', async (req, res) => {
   try {
-    const taskId = req.params.id;
-    const username = req.session.username;
+    const taskId = req.params.id; 
+    const username = req.query.usern;
+    
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).send('User not found');
@@ -71,23 +74,27 @@ router.post('/toggleTask/:id', async (req, res) => {
 
     const task = user.tasks.id(taskId);
     if (task) {
-      task.completed = !task.completed;
-      await user.save();
+      task.completed = !task.completed; 
+      await user.save(); 
     } else {
       return res.status(404).send('Task not found');
     }
 
-    res.redirect('/home');
+    res.redirect('/home?username=' + encodeURIComponent(username)); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 });
 
+
 router.post('/deleteTask/:id', async (req, res) => {
   try {
-    const taskId = req.params.id;
-    const username = req.session.username;
+    const taskId = req.params.id; 
+    const username = req.query.usern; 
+    
+    console.log('Task ID:', taskId);
+    console.log('Username:', username);
 
     const user = await User.findOneAndUpdate(
       { username },
@@ -98,7 +105,7 @@ router.post('/deleteTask/:id', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    res.redirect('/home');
+    res.redirect('/home?username=' + encodeURIComponent(username));
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -112,6 +119,7 @@ router.post('/changeBackground', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
+  console.log("here");
   req.session.destroy(err => {
     if (err) {
       console.error('Error destroying session:', err);

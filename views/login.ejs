@@ -7,72 +7,72 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-2X9vnqJ+e9Up7Rx8l+eG7A4kV6ZsG7D+2/1vG6u5MQ3nN3V9bk4tF4c9Suobnt5k6n5Hr/s4r6rVTX8DpKqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css" integrity="sha512-4TqjO1qKFTAd/JXtq1/QzAVfPfc7hbZqql+0BB1z7lc5JFs3u/Mu4A1Kk2NV1rFLQn6T5fbh+crJfoZCnVYFA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: url('<%= imageUrl %>') no-repeat center center fixed;
-        background-size: cover;
-        color: white;
-      }
-      .login-container {
-        background: rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        border-radius: 15px;
-        max-width: 500px;
-        width: 100%;
-        text-align: center;
-        backdrop-filter: blur(10px);
-      }
-      .login-container h1 {
-        font-size: 3rem;
-        margin-bottom: 20px;
-      }
-      .form-outline input {
-        font-size: 1.2rem;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .form-outline {
-        margin-bottom: 20px;
-      }
-      .btn {
-        font-size: 1.2rem;
-        padding: 10px 20px;
-      }
-      .error {
-        color: red;
-        font-size: 1.1rem;
-        margin-top: 10px;
-      }
-      .form-check-label, .form-label {
-        color: white;
-        font-size: 1.1rem;
-      }
-      a {
-        color: #007bff;
-      }
-      a:hover {
-        color: #0056b3;
-      }
-      .change-background-button {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        padding: 10px;
-        border: none;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-        z-index: 1000;
-      }
-      .change-background-button img {
-        width: 36px;
-        height: 36px;
-      }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url('<%= imageUrl %>') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .login-container {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .login-container h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .form-outline input {
+      font-size: 1.2rem;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .form-outline {
+      margin-bottom: 20px;
+    }
+    .btn {
+      font-size: 1.2rem;
+      padding: 10px 20px;
+    }
+    .error {
+      color: red;
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+    .form-check-label, .form-label {
+      color: white;
+      font-size: 1.1rem;
+    }
+    a {
+      color: #007bff;
+    }
+    a:hover {
+      color: #0056b3;
+    }
+    .change-background-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .change-background-button img {
+      width: 36px;
+      height: 36px;
+    }
   </style>
 </head>
 <body>
@@ -80,19 +80,17 @@
     <img src="/images/reset.png" alt="Change Background">
   </button>
   <div class="login-container">
-    <h1><%= new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></h1>
-    <form action="/login" method="POST" id="loginForm">
+    <h1 id="time"></h1>
+    <form id="loginForm">
       <div class="form-outline mb-4">
-        <input type="text" id="form2Example1" name="username" class="form-control" placeholder="Username" required />
+        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required />
       </div>
-
       <div class="form-outline mb-4">
-        <input type="password" id="form2Example2" name="password" class="form-control" placeholder="Password" required />
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
       </div>
-
-      <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">Sign in</button>
+      <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
     </form>
-    <div class="error"><%= error %></div>
+    <div class="error" id="error"></div>
     <div class="text-center mt-3">
       <p style="font-size: 1.2rem;">Not a member? <a href="/new" style="color: #007bff;">Register</a></p>
     </div>
@@ -104,11 +102,11 @@
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
-      document.querySelector('h1').textContent = `${hours}:${minutes}:${seconds}`;
+      document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
     }
-
+  
     setInterval(updateTime, 1000);
-
+  
     document.querySelector('.change-background-button').addEventListener('click', function() {
       fetch('/login/changeBackground', { method: 'POST' })
         .then(response => response.json())
@@ -121,24 +119,43 @@
         })
         .catch(error => console.error('Error:', error));
     });
-
+  
     document.getElementById('loginForm').addEventListener('submit', function(e) {
-      const username = document.querySelector('input[name="username"]').value;
-      const password = document.querySelector('input[name="password"]').value;
-      
-      localStorage.setItem('username', username);
-      localStorage.setItem('password', password);
-      localStorage.setItem('isLoggedIn', 'true');
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: pass,
+          username: user
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem('username', user);
+          localStorage.setItem('password', pass); 
+          localStorage.setItem('isLoggedIn', 'true');
+          window.location.href = `${data.redirect}?username=${encodeURIComponent(user)}`;
+        } else {
+          document.getElementById('error').textContent = data.error;
+          if (data.imageUrl) {
+            document.body.style.backgroundImage = `url('${data.imageUrl}')`;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('error').textContent = 'An error occurred';
+      });
     });
 
-    function logout() {
-      localStorage.removeItem('username');
-      localStorage.removeItem('password');
-      localStorage.setItem('isLoggedIn', 'false');
-      window.location.href = '/login'; 
-    }
-
     updateTime();
-  </script>
+  </script>  
 </body>
 </html>
