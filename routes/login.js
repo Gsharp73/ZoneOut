@@ -3,6 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const axios = require('axios');
 
+// Global variable to store the random image URL
+let globalImageUrl = '';
+
 async function getRandomImage() {
   try {
     const response = await axios.get(`https://api.unsplash.com/photos/random?client_id=${process.env.UNSPLASH_ACCESS_KEY}`);
@@ -15,8 +18,23 @@ async function getRandomImage() {
 
 router.get('/', async (req, res) => {
   try {
-    const imageUrl = await getRandomImage();
-    res.render('login', { imageUrl, error: null });
+    // Check if the global image URL is empty
+    if (!globalImageUrl) {
+      globalImageUrl = await getRandomImage();
+    }
+    res.render('login', { imageUrl: globalImageUrl, error: null });
+  } catch (error) {
+    res.status(500).send('Server Error');
+  }
+});
+
+router.get('/new', async (req, res) => {
+  try {
+    // Check if the global image URL is empty
+    if (!globalImageUrl) {
+      globalImageUrl = await getRandomImage();
+    }
+    res.render('newuser', { imageUrl: globalImageUrl, error: null });
   } catch (error) {
     res.status(500).send('Server Error');
   }
@@ -30,12 +48,14 @@ router.post('/login', async (req, res) => {
 
     if (user && user.password === password) {
       req.session.username = username;
-      console.log("Loggedin");
+      console.log("Logged in");
       res.json({ success: true, redirect: '/home' });
     } else {
-      console.log("false");
-      const imageUrl = await getRandomImage();
-      res.json({ success: false, error: 'Invalid username or password', imageUrl });
+      console.log("Invalid credentials");
+      if (!globalImageUrl) {
+        globalImageUrl = await getRandomImage();
+      }
+      res.json({ success: false, error: 'Invalid username or password', imageUrl: globalImageUrl });
     }
   } catch (error) {
     console.error('Error during login:', error);
@@ -49,8 +69,10 @@ router.post('/new', async (req, res) => {
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
-      const imageUrl = await getRandomImage();
-      res.json({ success: false, error: 'Username already exists', imageUrl });
+      if (!globalImageUrl) {
+        globalImageUrl = await getRandomImage();
+      }
+      res.json({ success: false, error: 'Username already exists', imageUrl: globalImageUrl });
     } else {
       const newUser = new User({ username, password });
       await newUser.save();

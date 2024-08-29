@@ -32,7 +32,6 @@ router.get('/', async (req, res) => {
   }
 
   let imageUrl = req.session.imageUrl;
-
   if (!imageUrl) {
     imageUrl = await getRandomImage();
     req.session.imageUrl = imageUrl; 
@@ -47,9 +46,6 @@ router.get('/', async (req, res) => {
 
 router.post('/addTask', async (req, res) => {
   const { taskName, username } = req.body;
-  console.log(req.body);
-  console.log(taskName);
-  console.log(username);
   if (!username) {
     return res.status(401).send('Unauthorized');
   }
@@ -65,7 +61,7 @@ router.post('/addTask', async (req, res) => {
 router.post('/toggleTask/:id', async (req, res) => {
   try {
     const taskId = req.params.id; 
-    const username = req.query.usern;
+    const username = req.query.username;
     
     const user = await User.findOne({ username });
     if (!user) {
@@ -87,15 +83,11 @@ router.post('/toggleTask/:id', async (req, res) => {
   }
 });
 
-
 router.post('/deleteTask/:id', async (req, res) => {
   try {
     const taskId = req.params.id; 
-    const username = req.query.usern; 
+    const username = req.query.username; 
     
-    console.log('Task ID:', taskId);
-    console.log('Username:', username);
-
     const user = await User.findOneAndUpdate(
       { username },
       { $pull: { tasks: { _id: taskId } } }
@@ -119,7 +111,6 @@ router.post('/changeBackground', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  console.log("here");
   req.session.destroy(err => {
     if (err) {
       console.error('Error destroying session:', err);

@@ -70,7 +70,7 @@
 <body>
   <div class="register-container">
     <h1>Create a New Account</h1>
-    <form action="/new" method="POST">
+    <form id="registerForm">
       <div>
         <input type="text" name="username" placeholder="Username" required />
       </div>
@@ -79,8 +79,41 @@
       </div>
       <button type="submit">Register</button>
     </form>
-    <div class="error"><%= error %></div>
+    <div class="error" id="error"><%= error %></div>
     <a href="/">Back to Login</a>
   </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+      event.preventDefault(); 
+
+      const username = event.target.username.value;
+      const password = event.target.password.value;
+
+      try {
+        const response = await fetch('/new', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          localStorage.setItem('username', username);
+          localStorage.setItem('password', password); 
+          localStorage.setItem('isLoggedIn', 'true');
+          window.location.href = `${result.redirect}?username=${encodeURIComponent(username)}`;
+        } else {
+          document.getElementById('error').textContent = result.error;
+        }
+      } catch (error) {
+        document.getElementById('error').textContent = 'An unexpected error occurred.';
+        console.error('Error during registration:', error);
+      }
+    });
+  </script>
 </body>
 </html>
