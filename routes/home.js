@@ -3,8 +3,6 @@ const router = express.Router();
 const axios = require('axios');
 const User = require('../models/User');
 
-let cachedImageUrl = null;
-
 async function getRandomImage() {
   try {
     const response = await axios.get('https://api.unsplash.com/photos/random', {
@@ -49,6 +47,10 @@ router.get('/', async (req, res) => {
 router.post('/addTask', async (req, res) => {
   const { taskName } = req.body;
   const username = req.session.username;
+  
+  if (!username) {
+    return res.status(401).send('Unauthorized');
+  }
 
   await User.findOneAndUpdate(
     { username: username },
@@ -60,54 +62,63 @@ router.post('/addTask', async (req, res) => {
 
 router.post('/toggleTask/:id', async (req, res) => {
   try {
-      const taskId = req.params.id;
-      const username = req.session.username;
-      const user = await User.findOne({ username });
-      if (!user) {
-          return res.status(404).send('User not found');
-      }
+    const taskId = req.params.id;
+    const username = req.session.username;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
 
-      const task = user.tasks.id(taskId);
-      if (task) {
-          task.completed = !task.completed;
-          await user.save();
-      } else {
-          return res.status(404).send('Task not found');
-      }
+    const task = user.tasks.id(taskId);
+    if (task) {
+      task.completed = !task.completed;
+      await user.save();
+    } else {
+      return res.status(404).send('Task not found');
+    }
 
-      res.redirect('/home');
+    res.redirect('/home');
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
 router.post('/deleteTask/:id', async (req, res) => {
   try {
-      const taskId = req.params.id;
-      const username = req.session.username;
+    const taskId = req.params.id;
+    const username = req.session.username;
 
-      const user = await User.findOneAndUpdate(
-          { username },
-          { $pull: { tasks: { _id: taskId } } }
-      );
+    const user = await User.findOneAndUpdate(
+      { username },
+      { $pull: { tasks: { _id: taskId } } }
+    );
 
-      if (!user) {
-          return res.status(404).send('User not found');
-      }
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
 
-      res.redirect('/home');
+    res.redirect('/home');
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 });
-
 
 router.post('/changeBackground', async (req, res) => {
   const newImageUrl = await getRandomImage();
   req.session.imageUrl = newImageUrl; 
   res.json({ imageUrl: newImageUrl });
+});
+
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+    res.redirect('/');
+  });
 });
 
 module.exports = router;

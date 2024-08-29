@@ -161,6 +161,23 @@
       height: 36px;
     }
 
+    .logout-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .logout-button img {
+      width: 36px;
+      height: 36px;
+    }
+
     .delete-button {
       background: rgba(255, 255, 255, 0.5); 
       border: none;
@@ -218,6 +235,11 @@
   <button class="change-background-button" title="Change Background">
     <img src="/images/reset.png" alt="Change Background">
   </button>
+  
+  <button class="logout-button" title="Logout">
+    <img src="/images/logout.png" alt="Logout">
+  </button>
+  
   <div>
     <h1><%= currentTime %></h1>
     <h2>Hi <%= username %>!</h2>
@@ -248,30 +270,48 @@
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      document.querySelector('h1').textContent = `${hours}:${minutes}:${seconds}`;
-    }
+      function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.querySelector('h1').textContent = `${hours}:${minutes}:${seconds}`;
+      }
 
-    setInterval(updateTime, 1000);
+      setInterval(updateTime, 1000);
 
-    document.querySelector('.change-background-button').addEventListener('click', function() {
-      fetch('/home/changeBackground', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-          if (data.imageUrl) {
-            document.body.style.backgroundImage = `url('${data.imageUrl}')`;
-          } else {
-            console.error('Failed to change background image');
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    });
+      document.querySelector('.change-background-button').addEventListener('click', function() {
+        fetch('/home/changeBackground', { method: 'POST' })
+          .then(response => response.json())
+          .then(data => {
+            if (data.imageUrl) {
+              document.body.style.backgroundImage = `url('${data.imageUrl}')`;
+            } else {
+              console.error('Failed to change background image');
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      });
 
-    updateTime();
+      document.querySelector('.logout-button').addEventListener('click', function() {
+        fetch('/home/logout', { method: 'POST' })
+          .then(() => {
+            localStorage.removeItem('username');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = '/'; 
+          });
+      });
+
+      function checkLoginStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+          window.location.href = '/'; 
+        }
+      }
+
+      checkLoginStatus();
+      updateTime();
   </script>
+
 </body>
 </html>

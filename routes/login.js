@@ -26,6 +26,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
 router.get('/new', async (req, res) => {
   const imageUrl = await getRandomImage();
   res.render('newuser', { imageUrl, error: null });
